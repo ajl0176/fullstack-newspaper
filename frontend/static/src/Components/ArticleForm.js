@@ -26,13 +26,11 @@ class ArticleForm extends Component {
   addArticle(event){
     event.preventDefault();
 
-    const formData = new FormData()
-    formData.append('title', 'testTitle')
 
     fetch('/api/v1/articles/', {
        method: 'post',
        headers: {'Content-Type':'application/json'},
-       body: formData
+       body: ''
 
     });
 };
@@ -48,12 +46,12 @@ class ArticleForm extends Component {
             <input type="text"defaultValue={this.state.title} onChange ={this.handleChange} />
               </div>
                 <div className="form-group">
-                          <label className="news-title">Author</label>
-                            <input type="text"defaultValue={this.state.author} onChange={this.handleChange}/>
-                              </div>
-                            <div className="form-group">
-                          <label className="news-title">Category</label>
-                        <select className="news-option" id="category" name="category" defaultValue={this.state.category} onChange={this.handleChange}>
+                  <label className="news-title">Author</label>
+                    <input type="text"defaultValue={this.state.author} onChange={this.handleChange}/>
+                  </div>
+                  <div className="form-group">
+                  <label className="news-title">Category</label>
+                  <select className="news-option" id="category" name="category" defaultValue={this.state.category} onChange={this.handleChange}>
                       <option defaultValue="Editorials">Editorials</option>
                      <option defaultValue="Sports">Sports</option>
                    <option defaultValue="Entertainment">Entertainment</option>
