@@ -12,11 +12,11 @@ class ArticleSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.username')
     class Meta:
         model = Article
-        fields = ('id', 'title','body', 'category', 'status', 'topstory', 'created_at', 'user', 'image')
+        fields = ('id', 'title','body', 'category', 'status', 'headliners', 'created_at', 'user', 'image')
 
 
 class TokenSerializer(serializers.ModelSerializer):
-    is_staff = serializers.ReadOnlyField(source='user.is_staff')    
+    is_staff = serializers.ReadOnlyField(source='user.is_staff')
     class Meta:
         model = TokenModel
         fields = ('key', 'is_staff')

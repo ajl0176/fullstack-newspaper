@@ -1,24 +1,8 @@
 import React, {Component} from 'react';
 
 
-function Feature(props) {
-  return(
-    <button type="button" className="list-group-item list-group-item-action font-weight-bold" onClick={() => props.readMore(props.article)}>{props.article.title}</button>
-  )
-}
-
-function Headliners(props) {
-  return(
-    <button type="button" className="list-group-item list-group-item-action" onClick={() => props.readMore(props.article)}>
-      <div>
-        <img className="article-image" src={props.article.image} alt="Article" />
-      </div>
-      <h4 className="category-title font-weight-bold article-title">{props.article.title}</h4>
-      <div id="headliner" className="category-body">
-        <p>{props.article.body}</p>
-      </div>
-    </button>
-  )
+function ArticleItem(props){
+  <div onClick={()=>}
 }
 
 function ArticleList(props) {

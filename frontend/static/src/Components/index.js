@@ -1,45 +1,64 @@
 import React, { Component } from 'react';
 import './index.css';
 import Cookies from 'js-cookie';
-import NewArticle from './NewArticle';
+import ArticleForm from './ArticleForm';
 import Editorials from './Editorials';
 import Entertainment from './Entertainment';
 import Login from './Login';
-import Articleinfull from './Articleinfull';
-import NewsList from './NewsList';
+import ArticleList from './ArticleList';
 import Register from './Register';
 import Sport from './Sport';
 
-
-
-class Components extends Component {
+class App extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
       articles: [],
-      button: 'home',
-      loggedIn: Cookies.get('Authorization')? true:false,
-    }
+      title: [],
+      page: 'articles',    }
 
+
+    this.fetchUserArticles = this.fetchUserArticles.bind(this);
+    this.fetchArticles = this.fetchArticles.bind(this);
+    this.handleSelection = this.handleSelection.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleRegistration = this.handleRegistration.bind(this);
+    this.handleEdit = this.handleEdit.bind(this);
     this.handleLogin = this.handleLogin.bind(this);
-    this.handleLogout = this.handleLogout.bind(this);
-    this.returnHome = this.returnHome.bind(this);
-    this.renderEntertainment = this.renderEntertainment.bind(this);
-    this.renderEditorials = this.renderEditorials.bind(this);
-    this.renderSports = this.renderSports.bind(this);
-
-
+    this.handleLogOut = this.handleLogOut.bind(this);
   }
 
-  componentDidMount(){
-    fetch('/api/v1/articles/')
-      .then(res => res.json())
+  handleSelection(selection) {
+    if (selection === 'myArticle'){
+      this.fetchUserArticles();
+    }
+    this.setState({page: selection});
+  }
+
+
+  componentDidMount() {
+    if(Cookies.get('Authorization')) {
+      this.fetchUserArticles();
+    } else {
+      this.fetchArticles();
+    }
+  }
+
+  fetchArticles() {
+    fetch('api/v1/articles/')
+      .then(response => response.json())
       .then(data => this.setState({articles: data}))
-      .catch(error => console.log('Error: ', error));
+      .catch(error => console.log('Error:', error));
   }
+
+  fetchUserArticles() {
+    fetch('/api/v1/articles/user/')
+    .then(response => response.json())
+    .then(data => this.setState({articles: data}))
+    .catch(error => console.log('Error:', error));
+  }
+
 
   handleSubmit(event, data){
     event.preventDefault();
@@ -143,68 +162,3 @@ async handleLogin(event, obj) {
       this.returnHome();
     }
   }
-returnHome(){
-  this.setState({button:'home'});
-}
-renderEntertainment(){
-  this.setState({button: 'entertainment'})
-}
-renderEditorials(){
-  this.setState({button: 'editorials'})
-}
-renderSports(){
-  this.setState({button: 'sports'})
-}
-renderreadMore(){
-  this.setState({button: 'readMore'});
-  window.scrollTo({
-    top:0,
-  });
-}
-
-  render() {
-    const loggedIn = this.state.loggedIn;
-    const button = this.state.button;
-    let page;
-    if (button === 'home') {
-     page = <NewsList readMore={this.readMore} articles={this.state.articles.filter(article => article.status === 'PUB')} />
-   } else if (button === 'entertainment') {
-     page = <Entertainment readMore={this.readMore} articles={this.state.articles.filter(article => article.category === 'ET')} />
-   } else if (button === 'editorials') {
-     page = <Editorials readMore={this.readMore} articles={this.state.articles.filter(article => article.category === 'ED')} />
-   } else if (button === 'sports') {
-     page = <Sport readMore={this.readMore} articles={this.state.articles.filter(article => article.category === 'SP')} />
-   } else if (button === 'newArticle') {
-     page = <NewArticle handleSubmit={this.handleSubmit} />
-   } else if (button === 'register') {
-     page = <Register handleRegistration={this.handleRegistration} />
-   } else if (button === 'login') {
-     page = <Login handleLogin={this.handleLogin} />
-   } else if (button === 'readMore') {
-     page = <ArticleDetails article={this.state.article} />
-   }
-
-return (
-  <div className="container-fluid">
-    <React.Fragment>
-
-      <div>
-      <h1>THE CODING CHRONICLES</h1>
-        <nav>
-            <button className ="navbar" onClick={this.returnHome}>Home</button>
-            <button type="button" classname="btn" onClick={this.renderEntertainment}>Entertainment</button>
-            <button type="button" classname="btn" onClick={this.renderEditorials}>Editorials</button>
-            <button type="button" classname="btn" onClick={this.renderSports}>Sports</button>
-
-            <button type="button" classname="btn" onClick={this.handleRegistration}>Register</button>
-            <button type="button" classname="btn" onClick={this.handleLogin}>Login</button>
-
-        </nav>
-        </div>
-        </React.Fragment>
-      }
-      </div>
-      )
-    }
-}
- export default Components;
