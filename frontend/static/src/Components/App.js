@@ -11,140 +11,171 @@ import ArticleList from './ArticleList';
 import ArticleForm from './ArticleForm';
 
 
-  class App extends Component {
-    constructor(props) {
-      super(props)
+class App extends Component {
+  constructor(props) {
+    super(props)
 
-      this.state = {
-        articles: [],
-        title: [],
-        loggedin: Cookies.get('Authorization'),
-        display: 'articles',
+    this.state = {
+      articles: [],
+      title: [],
+      loggedIn: Cookies.get('Authorization')? true: false,
+      display: 'articles',
+
+    }
+   this.fetchArticles = this.fetchArticles.bind(this);
+   this.handleClick = this.handleClick.bind(this);
+   this.registerUser = this.registerUser.bind(this);
+   this.logIn = this.logIn.bind(this);
+   this.logOut = this.logOut.bind(this);
+    }
+
+  componentDidMount(){
+   this.fetchArticles();
+    }
+
+  fetchArticles(){
+    fetch ('api/v1/articles/')
+      .then (response => response.json())
+      .then (data => this.setState({articles: data}))
+      .catch (error => console.log ('Error:', error));
+    }
+
+    handleClick(html) {
+      this.setState({display: html})
 
 }
-      this.fetchArticles = this.fetchArticles.bind(this);
-      this.handlePost = this.handlePost.bind(this);
-      this.registeration = this.registeration.bind(this);
-      this.logIn = this.logIn.bind(this);
-      this.logOut = this.logOut.bind(this);
-    }
+  async logIn(e, obj, reg){
+    e.preventDefault();
+    if(reg){
+      this.setState({display: 'register'});
+    }else{
 
-    componentDidMount(){
-      this.fetchArticles();
-    }
+  const options = {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': Cookies.get('csrftoken'),
+      'Content-Type': 'application/json'
+       },
+      body: JSON.stringify(obj)
+      };
 
-    fetchArticles(){
-      fetch ('api/v1/articles/')
-        .then (response => response.json())
-        .then (data => this.setState({articles: data}))
-        .catch (error => console.log ('Error:', error));
-    }
+  const handleError = (err) => console.warn(err);
+  const response = await fetch('api/v1/rest-auth/login/', options)
+  const data = await response.json().catch(handleError)
 
-    async logIn(e, obj){
-        e.preventDefault();
+   if(data.key){
+    Cookies.set('Authorization', `Token ${data.key}`);
+    this.setState({loggedin: true});
+    localStorage.setItem('is_staff', data.is_staff);
+    this.setState({display: 'login'})
+    console.log(data.is_staff);
+    console.log(localStorage.getItem('is_staff'));
+     }
+   }
+}
 
-        const options = {
-          method: 'POST',
-          headers: {
-            'X-CSRFToken': Cookies.get('csrftoken'),
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(obj)
-        };
+  // async handlePost(e, obj){
+  //   e.preventDefault();
+  //
+  // const options = {
+  //   method: 'POST',
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //     'X-CSRFToken': Cookies.get('csrftoken'),
+  //       },
+  //     body: JSON.stringify(obj)
+  //       };
+  //
+  // const handleError = (err) => console.warn(err);
+  // const response = await fetch('/api/v1/articles/', options);
+  // const data = await response.json().catch(handleError);
+  //
+  // if(data.key){
+  //   Cookies.set('Authorization', `Token ${data.key}`)
+  //   }
+  //
+  // }
+  async registerUser(e, obj){
+    e.preventDefault();
 
-        const handleError = (err) => console.warn(err);
-        const response = await fetch('api/v1/rest-auth/login/', options)
-        const data = await response.json().catch(handleError)
+  const options = {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': Cookies.get('csrftoken'),
+      'Content-Type': 'application/json'
+      },
+    body: JSON.stringify(obj),
+      };
 
-      if(data.key){
-        Cookies.set('Authorization', `Token ${data.key}`);
-        this.setState({loggedin: true});
-        }
+  const handleError = (err) => console.warn(err);
+  const response = await fetch('api/v1/rest-auth/registration/', options)
+  const data = await response.json().catch(handleError)
+
+    if(data.key){
+    Cookies.set('Authorization', `Token ${data.key}`);
+      this.setState({loggedin: true});
+      this.setStage({display: 'register'})
       }
+  }
 
-    async handlePost(e, obj){
-        e.preventDefault();
-        const options = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': Cookies.get('csrftoken'),
-           },
-           body: JSON.stringify(obj)
-         };
+  async logOut(e){
+    e.preventDefault();
 
-      const handleError = (err) => console.warn(err);
-      const response = await fetch('/api/v1/articles/', options);
-      const data = await response.json().catch(handleError);
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': Cookies.get('csrftoken'),
+        },
+      };
 
-      if(data.key){
-      Cookies.set('Authorization', `Token ${data.key}`)
-         }
+  const handleError = (err) => console.warn(err);
+  const response = await fetch('/api/v1/rest-auth/logout/', options);
+  const data = await response.json().catch(handleError);
 
-       }
-       async registeration(e, obj){
-           e.preventDefault();
+  if(data.detail === "Successfully logged out."){
+    Cookies.remove('Authorization');
+      this.setState({display: 'articles'});
+      this.setState({loggedin: false});
+      localStorage.removeItem('is_staff');
+      }
+    }
 
-           const options = {
-             method: 'POST',
-             headers: {
-               'X-CSRFToken': Cookies.get('csrftoken'),
-               'Content-Type': 'application/json'
-             },
-             body: JSON.stringify(obj),
-           };
+  render(){
+    let html;
+    const display = this.state.display;
 
-           const handleError = (err) => console.warn(err);
-           const response = await fetch('api/v1/rest-auth/registration/', options)
-           const data = await response.json().catch(handleError)
+    if (display === 'register'){
+      html = <Register registerUser={this.registerUser}/>
+  } else if (display === 'login') {
+      html = <Login logIn={this.logIn}/>
+  } else if (display === 'articles') {
+      html = <ArticleList articles={this.state.articles} />
+  }
 
-           if(data.key){
-             Cookies.set('Authorization', `Token ${data.key}`);
-             this.setState({loggedin: true});
-           }
-         }
+     return(
+        <React.Fragment>
+          <div>
+            <nav className="navbar navbar-dark bg-dark container-fluid">
+              <div>
+                  <button className="btn" type='button' onClick={() => this.handleClick}>Home</button>
+                  <button className="btn" type='button' onClick={this.handleClick}>Entertainment</button>
+                  <button className="btn" type='button' onClick={this.handleClick}>Sports</button>
+                  <button className="btn" type='button' onClick={this.handleClick}>Editorials</button>
+                  <button className="btn btn-link" type='button' onClick= {() => this.handleClick('Login')}>Log In</button>
+                  <button className="btn btn-link" type='button' onClick= {() => this.handleClick('Register')}>Register</button>
 
-         async logOut(e){
-                e.preventDefault();
-
-                const options = {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': Cookies.get('csrftoken'),
-                  },
-                };
-
-                const handleError = (err) => console.warn(err);
-                const response = await fetch('/api/v1/rest-auth/logout/', options);
-                const data = await response.json().catch(handleError);
-
-                if(data.detail === "Successfully logged out."){
-                  Cookies.remove('Authorization');
-                  this.setState({page: 'login'});
-                }
-
-              }
-
-              render(){
-                let html;
-                const display = this.state.display;
-
-                if (display === 'register'){
-                  html = <Register registerUser={this.registerUser}/>
-                } else if (display === 'login') {
-                  html = <Login logIn={this.logIn}/>
-                } else if (display === 'articles') {
-                  html = <ArticleList articles={this.state.articles} />
-                }
-
-                  return(
-                    <React.Fragment>
-                      <div>{html}</div>
-                    </React.Fragment>
-                  );
-                  }
-                }
+                  <div className="heading">
+                    <h1 className="title">THE CODING CHRONICLES</h1>
+                  </div>
+                <div>{html}</div>
+              </div>
+          </nav>
+        </div>
+      </React.Fragment>
+        );
+      }
+    }
 
 
-              export default App;
+export default App;

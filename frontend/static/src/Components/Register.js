@@ -11,7 +11,7 @@ class Register extends Component {
       password1:'',
       password2:'',
     }
-    this.handleChange = this.handleChange.bind(this)
+    this.handleChange = this.handleChange.bind(this);
   }
   handleChange(event){
     this.setState({[event.target.name]: event.target.value});
@@ -19,8 +19,9 @@ class Register extends Component {
 
  render(){
    return(
+     <div>
+     <h1>Registration Form</h1>
      <form className="col-12 col-md-6" onSubmit={(event) => this.props.registerUser(event, this.state)}>
-        <h5 className="Register">Create Account</h5>
         <div className="form-group">
           <label htmlFor="username">Username</label>
           <input type='text' className="form-control" id="username" name="username" value={this.state.username} onChange={this.handleChange}/>
@@ -34,13 +35,12 @@ class Register extends Component {
           <input type='text' className="form-control" id="password1" name="password1" value={this.state.password1} onChange={this.handleChange}/>
         </div>
         <div className="form-group">
-          <label htmlFor="password2">Confirm Password</label>
+          <label htmlFor="password2">Password</label>
           <input type='text' className="form-control" id="password2" name="password2" value={this.state.password2} onChange={this.handleChange}/>
         </div>
-        <div className="create-Account-Btn">
           <button className="btn btn-primary">Register</button>
-        </div>
       </form>
+      </div>
    )
  }
 }
