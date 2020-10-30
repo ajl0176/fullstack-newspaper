@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
 import './index.css';
 import Cookies from 'js-cookie';
-
-// import Editorials from './Editorials';
-// import Entertainment from './Entertainment';
 import Login from './Login';
 import Register from './Register';
 
@@ -19,7 +16,7 @@ class App extends Component {
       articles: [],
       title: [],
       loggedIn: Cookies.get('Authorization')? true: false,
-      display: 'articles',
+      display: 'all',
 
     }
    this.fetchArticles = this.fetchArticles.bind(this);
@@ -74,27 +71,6 @@ class App extends Component {
    }
 }
 
-  // async handlePost(e, obj){
-  //   e.preventDefault();
-  //
-  // const options = {
-  //   method: 'POST',
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //     'X-CSRFToken': Cookies.get('csrftoken'),
-  //       },
-  //     body: JSON.stringify(obj)
-  //       };
-  //
-  // const handleError = (err) => console.warn(err);
-  // const response = await fetch('/api/v1/articles/', options);
-  // const data = await response.json().catch(handleError);
-  //
-  // if(data.key){
-  //   Cookies.set('Authorization', `Token ${data.key}`)
-  //   }
-  //
-  // }
   async registerUser(e, obj){
     e.preventDefault();
 
@@ -149,27 +125,26 @@ class App extends Component {
       html = <Register registerUser={this.registerUser}/>
   } else if (display === 'login') {
       html = <Login logIn={this.logIn}/>
-  } else if (display === 'articles') {
-      html = <ArticleList articles={this.state.articles} />
+  } else  {
+      html = <ArticleList articles={this.state.articles} filter={this.state.display}/>
   }
 
      return(
         <React.Fragment>
-          <div>
-            <nav className="navbar navbar-dark bg-dark container-fluid">
-              <div>
-                  <button className="btn" type='button' onClick={() => this.handleClick}>Home</button>
-                  <button className="btn" type='button' onClick={this.handleClick}>Entertainment</button>
-                  <button className="btn" type='button' onClick={this.handleClick}>Sports</button>
-                  <button className="btn" type='button' onClick={this.handleClick}>Editorials</button>
-                  <button className="btn btn-link" type='button' onClick= {() => this.handleClick('Login')}>Log In</button>
-                  <button className="btn btn-link" type='button' onClick= {() => this.handleClick('Register')}>Register</button>
-
-                  <div className="heading">
-                    <h1 className="title">THE CODING CHRONICLES</h1>
-                  </div>
-                <div>{html}</div>
-              </div>
+         <div>
+           <nav className="navbar navbar-dark bg-dark container-fluid">
+             <div>
+               <button className="btn" type='button' onClick={() => this.handleClick('all')}>Home</button>
+               <button className="btn" type='button' onClick={() => this.handleClick('Entertainment')}>Entertainment</button>
+               <button className="btn" type='button' onClick={() => this.handleClick('Sports')}>Sports</button>
+               <button className="btn" type='button' onClick={() => this.handleClick('Editorials')}>Editorials</button>
+               <button className="btn" type='button' onClick= {() => this.handleClick('login')}>Log In</button>
+               <button className="btn" type='button' onClick= {() => this.handleClick('register')}>Register</button>
+               <div className="heading">
+                 <h1 className="title">THE CODING CHRONICLES</h1>
+               </div>
+               <div>{html}</div>
+            </div>
           </nav>
         </div>
       </React.Fragment>

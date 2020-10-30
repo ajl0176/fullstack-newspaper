@@ -36,7 +36,7 @@ function Feature(props) {
     // <button type="button" className="list-group-item list-group-item-action font-weight-bold" onClick={() => props.readMore(props.article)}>{props.article.title}</button>
     <div className="list-group-item list-group-item-action">
     <h4 className="category-title font-weight-bold article-title">{props.article.title}</h4>
-    <button className="btn btn-small" type="button"  onClick={()=>props.handleModal(this.article.id)}>Read More</button>
+    <button className="btn btn-small" type="button"  onClick={()=>(props.article.title)}>Read More</button>
     </div>
   )
 }
@@ -48,7 +48,7 @@ function Headliner(props) {
       <div id="headliner" className="category-body">
         <p>{props.article.body}</p>
         </div>
-        <button className="btn btn-small" type="button" onClick={props.article.title}>Read More</button>
+        <button className="btn btn-small" type="button" onClick={()=>(props.article.title)}>Read More</button>
     </div>
   )
 }
@@ -64,11 +64,10 @@ constructor(props){
    articleDisplay: {},
  }
  this.handleClick = this.handleClick.bind(this);
- this.handleModal = this.handleModal.bind(this);
 }
 
-handleClick(display) {
-   this.setState({category: display});
+handleClick(category) {
+   this.setState({display: category});
 }
 
 handleModal(display){
@@ -79,39 +78,28 @@ handleModal(display){
 
   render(){
 
-  // this.props.articles.forEach(article => console.log('headliner', article.headliners))
-  const headliners = this.props.articles
-    .filter(article => article.headliners)
-    .map(article => <Headliner key={article.id} article={article} readMore={this.props.readMore} />);
 
-  const features = this.props.articles
-    .filter(article => !article.headliners)
-    .map(article => <Feature key={article.id} article={article} readMore={this.props.readMore} />);
+    // this.props.articles.forEach(article => console.log('headliner', article.headliners))
 
-//   let category = this.props.category
-//   let allArticles;
-//
-//   if (category === 'Entertainment') {
-//     allArticles = this.props.articles
-//     .filter(article => article.category === 'entertainment')
-//     .map(article => <Category key={article.id} article={article} handleModal= {this.props.handleModal}/>)
-//   } else if (category ==='Sports') {
-//     allArticles = this.props.articles
-//     .filter(article => article.category === 'sports')
-//     .map(article => <Category key={article.id} article={article} handleModal= {this.props.handleModal}/>)
-//   } else if (category ==='Editorials') {
-//     allArticles = this.props.articles
-//     .filter(article => article.category === 'editorials')
-//     .map(article => <Category key={article.id} article={article} handleModal= {this.props.handleModal}/>)
-// }
+    const articles = this.props.articles
+      .filter(article => this.props.filter !== 'all' ? article.category === this.props.filter : article)
+
+    const headliners = articles
+      .filter(article => article.headliners)
+      .map(article => <Headliner key={article.id} article={article} readMore={this.props.readMore} />);
+
+    const features = articles
+      .filter(article => !article.headliners)
+      .map(article => <Feature key={article.id} article={article} readMore={this.props.readMore} />);
+
+
   return(
 <React.Fragment>
-
     <div className="container">
       <div className="row">
         <div className="col-headliners">
           <h3 className="category-header-headliners">Headliners</h3>
-        <div className="list-group-headliners">
+          <div className="list-group-headliners">
           {headliners}
         </div>
       </div>
@@ -123,17 +111,9 @@ handleModal(display){
       </div>
       </div>
     </div>
-  // <Modal show={this.state.show}>
-  //   <Modal.Header>
-  //     <Modal.Title>{this.state.articleDisplay.title}</Modal.Title>
-  //   </Modal.Header>
-  //   <Modal.Body>{this.state.articleDisplay.body}</Modal.Body>
-  //
-  //   <Modal.Footer>
-  //     <button onClick={(event) => this.setState({show:false})}>Close</button>
-  //   </Modal.Footer>
-  // </Modal>
-  // </React.Fragment>
+
+
+  </React.Fragment>
 
     );
   }
